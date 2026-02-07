@@ -3,6 +3,12 @@ import { startServer } from "./server.js";
 import { connectGranolaMCP } from "./granola/mcpClient.js";
 import { initVectorStore } from "./knowledge/vectorStore.js";
 import { initMeetingStore } from "./pipeline/meetingStore.js";
+import { registerPostProcessHook } from "./pipeline/meetingPipeline.js";
+import { startSlackApp } from "./slack/app.js";
+import { registerMentionHandler } from "./slack/mentionHandler.js";
+import { registerIngestCommand } from "./slack/ingestCommand.js";
+import { initLinearClient } from "./linear/client.js";
+import { slackPostProcessHook } from "./slack/postProcessHook.js";
 
 async function main() {
   console.log("=== Meeting Knowledge System ===\n");
@@ -28,7 +34,20 @@ async function main() {
   // Express server (webhooks + health)
   startServer();
 
-  // Person B adds: Slack bot boot, Linear client init
+  // Linear client (optional — skip if no real API key)
+  if (config.linear.apiKey && !config.linear.apiKey.startsWith("lin_api_...")) {
+    await initLinearClient();
+    console.log("[boot] Linear client ready");
+  } else {
+    console.log("[boot] Linear skipped (no API key). Issue creation disabled.");
+  }
+
+  // Slack bot
+  registerMentionHandler();
+  registerIngestCommand();
+  registerPostProcessHook(slackPostProcessHook);
+  await startSlackApp();
+  console.log("[boot] Slack bot ready");
 
   console.log(`\n[boot] System ready on port ${config.port}`);
 }
