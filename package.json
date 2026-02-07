@@ -1,0 +1,24 @@
+{
+  "name": "meeting-knowledge-system",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@linear/sdk": "^29.0.0",
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "@slack/bolt": "^4.3.0",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "openai": "^5.1.0",
+    "vectra": "^0.9.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.2",
+    "@types/node": "^22.15.3",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}
