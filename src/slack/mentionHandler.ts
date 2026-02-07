@@ -3,6 +3,10 @@ import { answerQuestion } from "../knowledge/qa.js";
 import { summarizeThread } from "./threadSummarizer.js";
 import { createIssueFromText } from "../linear/issueCreator.js";
 
+function tryReact(client: any, channel: string, timestamp: string, name: string): void {
+  client.reactions.add({ channel, timestamp, name }).catch(() => {});
+}
+
 export function registerMentionHandler(): void {
   slackApp.event("app_mention", async ({ event, client, say }) => {
     // Strip bot mention from text
@@ -14,11 +18,7 @@ export function registerMentionHandler(): void {
     try {
       // Intent: summarize thread
       if (text.toLowerCase().includes("summarize") && event.thread_ts) {
-        await client.reactions.add({
-          channel: event.channel,
-          timestamp: event.ts,
-          name: "brain",
-        });
+        tryReact(client, event.channel, event.ts, "brain");
         const summary = await summarizeThread(client, event.channel, event.thread_ts);
         await say({ text: summary, thread_ts: threadTs });
         return;
@@ -30,21 +30,13 @@ export function registerMentionHandler(): void {
         text.toLowerCase().includes("make ticket") ||
         text.toLowerCase().includes("create ticket")
       ) {
-        await client.reactions.add({
-          channel: event.channel,
-          timestamp: event.ts,
-          name: "hammer_and_wrench",
-        });
+        tryReact(client, event.channel, event.ts, "hammer_and_wrench");
         await createIssueFromText(text, client, event.channel, threadTs);
         return;
       }
 
       // Default: Q&A
-      await client.reactions.add({
-        channel: event.channel,
-        timestamp: event.ts,
-        name: "mag",
-      });
+      tryReact(client, event.channel, event.ts, "mag");
       const answer = await answerQuestion(text);
       await say({ text: answer, thread_ts: threadTs });
     } catch (err) {
