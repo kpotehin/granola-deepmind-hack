@@ -1,7 +1,7 @@
 import { slackApp } from "./app.js";
 import { answerQuestion } from "../knowledge/qa.js";
 import { summarizeThread } from "./threadSummarizer.js";
-import { createIssueFromText } from "../linear/issueCreator.js";
+import { executeActionAuto } from "../providers/actionExecutor.js";
 
 function tryReact(client: any, channel: string, timestamp: string, name: string): void {
   client.reactions.add({ channel, timestamp, name }).catch(() => {});
@@ -24,14 +24,14 @@ export function registerMentionHandler(): void {
         return;
       }
 
-      // Intent: create Linear issue
+      // Intent: create issue/ticket
       if (
         text.toLowerCase().includes("create issue") ||
         text.toLowerCase().includes("make ticket") ||
         text.toLowerCase().includes("create ticket")
       ) {
         tryReact(client, event.channel, event.ts, "hammer_and_wrench");
-        await createIssueFromText(text, client, event.channel, threadTs);
+        await executeActionAuto(text, client, event.channel, threadTs);
         return;
       }
 

@@ -7,8 +7,10 @@ import { registerPostProcessHook } from "./pipeline/meetingPipeline.js";
 import { startSlackApp } from "./slack/app.js";
 import { registerMentionHandler } from "./slack/mentionHandler.js";
 import { registerIngestCommand } from "./slack/ingestCommand.js";
-import { initLinearClient } from "./linear/client.js";
 import { slackPostProcessHook } from "./slack/postProcessHook.js";
+import { registerProvider } from "./providers/registry.js";
+import { LinearProvider } from "./providers/linear.js";
+import { GitHubProvider } from "./providers/github.js";
 
 async function main() {
   console.log("=== Meeting Knowledge System ===\n");
@@ -34,12 +36,29 @@ async function main() {
   // Express server (webhooks + health)
   startServer();
 
-  // Linear client (optional — skip if no real API key)
-  if (config.linear.apiKey && !config.linear.apiKey.startsWith("lin_api_...")) {
-    await initLinearClient();
-    console.log("[boot] Linear client ready");
+  // Action providers (register all configured ones)
+  if (config.linear.apiKey && config.linear.apiKey !== "lin_api_...") {
+    try {
+      const linear = new LinearProvider();
+      await linear.init();
+      registerProvider(linear);
+    } catch (err) {
+      console.warn("[boot] Linear provider failed:", err);
+    }
   } else {
-    console.log("[boot] Linear skipped (no API key). Issue creation disabled.");
+    console.log("[boot] Linear skipped (no API key)");
+  }
+
+  if (process.env.GITHUB_TOKEN && process.env.GITHUB_REPO) {
+    try {
+      const github = new GitHubProvider();
+      await github.init();
+      registerProvider(github);
+    } catch (err) {
+      console.warn("[boot] GitHub provider failed:", err);
+    }
+  } else {
+    console.log("[boot] GitHub skipped (no GITHUB_TOKEN/GITHUB_REPO)");
   }
 
   // Slack bot

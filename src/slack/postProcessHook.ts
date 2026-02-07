@@ -1,18 +1,20 @@
 import type { MeetingRecord, MeetingSummary } from "../granola/types.js";
 import { slackApp } from "./app.js";
 import { config } from "../config.js";
-import { createIssueFromText } from "../linear/issueCreator.js";
-import { linearClient } from "../linear/client.js";
+import { executeActionAuto } from "../providers/actionExecutor.js";
+import { getProvidersByType } from "../providers/registry.js";
 
 export async function slackPostProcessHook(
   record: MeetingRecord,
   summary: MeetingSummary
 ): Promise<void> {
+  console.log("[hook] Running Slack post-process hook...");
   const channelId = config.slack.summaryChannelId;
   if (!channelId) {
     console.warn("[hook] No SUMMARY_CHANNEL_ID set, skipping Slack notification");
     return;
   }
+  console.log(`[hook] Posting to channel ${channelId}`);
 
   // Format the summary message
   const actionList = summary.actionItems.length > 0
@@ -45,17 +47,20 @@ export async function slackPostProcessHook(
   const threadTs = result.ts;
   if (!threadTs) return;
 
-  // Auto-create Linear issues for action items with assignees (skip if Linear not configured)
-  if (!linearClient) {
-    console.log("[hook] Linear not configured, skipping issue creation");
+  // Auto-create issues for action items with assignees (using whatever provider is configured)
+  if (getProvidersByType("task-manager").length === 0) {
+    console.log("[hook] No task-manager providers configured, skipping issue creation");
     return;
   }
+
   const assignedItems = summary.actionItems.filter((a) => a.assignee);
+  console.log(`[hook] ${assignedItems.length} assigned action items to create issues for`);
   if (assignedItems.length === 0) return;
 
   for (const item of assignedItems) {
     try {
-      await createIssueFromText(
+      console.log(`[hook] Creating issue: "${item.task}" → ${item.assignee}`);
+      await executeActionAuto(
         `${item.task}, assign to ${item.assignee}`,
         slackApp.client,
         channelId,
