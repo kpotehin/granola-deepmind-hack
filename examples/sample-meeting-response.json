@@ -1,0 +1,61 @@
+{
+  "status": "ok",
+  "data": {
+    "id": "sample-response-001",
+    "title": "Weekly Engineering Standup — Feb 7",
+    "date": "2026-02-07T09:30:00Z",
+    "participants": [],
+    "rawNotes": "Attendees: Sarah (Engineering Manager), Mike (Backend), Priya (Frontend), James (DevOps)\n\nSarah kicked off the standup by asking for updates from each team member.\n\nMike reported that the new payments API is nearly complete. He finished the Stripe webhook integration yesterday and is now writing integration tests. He expects to have a PR ready for review by end of day Monday. One blocker: he needs James to provision a staging Stripe account with test keys.\n\nPriya shared progress on the dashboard redesign. The new analytics charts are done and she demoed them briefly — everyone was impressed with the real-time updating. She still needs to finish the mobile responsive layout, which she estimates will take 2 more days. She also flagged a bug where the date picker component crashes on Safari when selecting a date range spanning multiple months.\n\nJames gave a DevOps update. He completed the Kubernetes migration for the staging environment over the weekend. Production migration is planned for next Thursday during the maintenance window (2am-4am EST). He needs Sarah to send the downtime notification to customers at least 48 hours in advance. He also mentioned that AWS costs went up 15% last month due to the new ML pipeline — he is going to look into reserved instances to bring costs down.\n\nSarah wrapped up with two announcements: 1) The Q1 OKR review is next Wednesday, everyone needs to update their OKR progress in Lattice by Tuesday EOD. 2) The new intern, Alex, starts Monday — Priya will be his onboarding buddy.\n\nAction items discussed:\n- Mike: Open PR for payments API by Monday EOD\n- James: Provision staging Stripe account for Mike by Friday\n- Priya: File a bug ticket for the Safari date picker crash\n- Priya: Finish mobile responsive layout by Wednesday\n- James: Research AWS reserved instances and report savings estimate by next Friday\n- Sarah: Send production migration downtime notice to customers by Tuesday\n- Everyone: Update Q1 OKR progress in Lattice by Tuesday EOD\n- Priya: Prepare onboarding plan for intern Alex",
+    "transcript": "",
+    "granolaSummary": "",
+    "gptSummary": {
+      "summary": "The meeting focused on team updates and planning for upcoming tasks. Mike is nearing completion of the new payments API, Priya is working on the dashboard redesign, and James provided updates on the Kubernetes migration and AWS cost management.",
+      "keyDecisions": [
+        "Production migration planned for next Thursday",
+        "Priya will be onboarding buddy for new intern Alex"
+      ],
+      "actionItems": [
+        {
+          "task": "Open PR for payments API by Monday EOD",
+          "assignee": "Mike"
+        },
+        {
+          "task": "Provision staging Stripe account for Mike by Friday",
+          "assignee": "James"
+        },
+        {
+          "task": "File a bug ticket for the Safari date picker crash",
+          "assignee": "Priya"
+        },
+        {
+          "task": "Finish mobile responsive layout by Wednesday",
+          "assignee": "Priya"
+        },
+        {
+          "task": "Research AWS reserved instances and report savings estimate by next Friday",
+          "assignee": "James"
+        },
+        {
+          "task": "Send production migration downtime notice to customers by Tuesday",
+          "assignee": "Sarah"
+        },
+        {
+          "task": "Update Q1 OKR progress in Lattice by Tuesday EOD",
+          "assignee": null
+        },
+        {
+          "task": "Prepare onboarding plan for intern Alex",
+          "assignee": "Priya"
+        }
+      ],
+      "discussionPoints": [
+        "Payments API progress and Stripe integration",
+        "Dashboard redesign and mobile responsiveness",
+        "Kubernetes migration and AWS cost management",
+        "Next week's production migration and downtime notification",
+        "Q1 OKR updates and intern onboarding"
+      ]
+    },
+    "createdAt": "2026-02-07T12:43:12.570Z"
+  }
+}

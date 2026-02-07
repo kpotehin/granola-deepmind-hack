@@ -41,3 +41,19 @@ export async function getMeetingRecord(id: string): Promise<MeetingRecord | null
     return null;
   }
 }
+
+export async function listAllMeetings(): Promise<MeetingRecord[]> {
+  try {
+    const files = await fs.readdir(MEETINGS_DIR);
+    const jsonFiles = files.filter((f) => f.endsWith(".json"));
+    const meetings: MeetingRecord[] = [];
+    for (const file of jsonFiles) {
+      const raw = await fs.readFile(path.join(MEETINGS_DIR, file), "utf-8");
+      meetings.push(JSON.parse(raw));
+    }
+    meetings.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    return meetings;
+  } catch {
+    return [];
+  }
+}
