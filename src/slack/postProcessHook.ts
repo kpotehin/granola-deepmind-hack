@@ -1,5 +1,5 @@
 import type { MeetingRecord, MeetingSummary } from "../granola/types.js";
-import { slackApp } from "./app.js";
+import { getSlackApp } from "./app.js";
 import { config } from "../config.js";
 import { executeActionAuto } from "../providers/actionExecutor.js";
 import { getProvidersByType } from "../providers/registry.js";
@@ -38,7 +38,7 @@ export async function slackPostProcessHook(
   ].join("\n");
 
   // Post summary to channel
-  const result = await slackApp.client.chat.postMessage({
+  const result = await getSlackApp()!.client.chat.postMessage({
     channel: channelId,
     text,
     unfurl_links: false,
@@ -62,13 +62,13 @@ export async function slackPostProcessHook(
       console.log(`[hook] Creating issue: "${item.task}" → ${item.assignee}`);
       await executeActionAuto(
         `${item.task}, assign to ${item.assignee}`,
-        slackApp.client,
+        getSlackApp()!.client,
         channelId,
         threadTs
       );
     } catch (err) {
       console.error(`[hook] Failed to create issue for "${item.task}":`, err);
-      await slackApp.client.chat.postMessage({
+      await getSlackApp()!.client.chat.postMessage({
         channel: channelId,
         thread_ts: threadTs,
         text: `❌ Failed to create issue: *${item.task}* — ${err instanceof Error ? err.message : "unknown error"}`,

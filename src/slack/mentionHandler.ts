@@ -1,4 +1,4 @@
-import { slackApp } from "./app.js";
+import { getSlackApp } from "./app.js";
 import { answerQuestion } from "../knowledge/qa.js";
 import { summarizeThread } from "./threadSummarizer.js";
 import { executeActionAuto } from "../providers/actionExecutor.js";
@@ -8,7 +8,7 @@ function tryReact(client: any, channel: string, timestamp: string, name: string)
 }
 
 export function registerMentionHandler(): void {
-  slackApp.event("app_mention", async ({ event, client, say }) => {
+  getSlackApp()!.event("app_mention", async ({ event, client, say }) => {
     // Strip bot mention from text
     const text = event.text.replace(/<@[A-Z0-9]+>/g, "").trim();
     const threadTs = event.thread_ts || event.ts;

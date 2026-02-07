@@ -1,10 +1,10 @@
-import { slackApp } from "./app.js";
+import { getSlackApp } from "./app.js";
 import { processMeeting } from "../pipeline/meetingPipeline.js";
 import crypto from "crypto";
 
 export function registerIngestCommand(): void {
   // /ingest opens a modal
-  slackApp.command("/ingest", async ({ ack, client, body }) => {
+  getSlackApp()!.command("/ingest", async ({ ack, client, body }) => {
     await ack();
 
     await client.views.open({
@@ -42,7 +42,7 @@ export function registerIngestCommand(): void {
   });
 
   // Handle modal submission
-  slackApp.view("ingest_modal", async ({ ack, view, client, body }) => {
+  getSlackApp()!.view("ingest_modal", async ({ ack, view, client, body }) => {
     await ack();
 
     const title =

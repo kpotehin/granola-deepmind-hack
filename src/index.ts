@@ -4,7 +4,7 @@ import { connectGranolaMCP } from "./granola/mcpClient.js";
 import { initVectorStore } from "./knowledge/vectorStore.js";
 import { initMeetingStore } from "./pipeline/meetingStore.js";
 import { registerPostProcessHook } from "./pipeline/meetingPipeline.js";
-import { startSlackApp } from "./slack/app.js";
+import { initSlackApp, startSlackApp } from "./slack/app.js";
 import { registerMentionHandler } from "./slack/mentionHandler.js";
 import { registerIngestCommand } from "./slack/ingestCommand.js";
 import { slackPostProcessHook } from "./slack/postProcessHook.js";
@@ -23,7 +23,7 @@ async function main() {
   console.log("[boot] Vector store ready");
 
   // Granola MCP — only connect if token is configured
-  if (config.granola.oauthToken) {
+  if (config.granola.oauthToken && config.granola.oauthToken !== "placeholder") {
     try {
       await connectGranolaMCP();
     } catch (err) {
@@ -37,7 +37,8 @@ async function main() {
   startServer();
 
   // Action providers (register all configured ones)
-  if (config.linear.apiKey && config.linear.apiKey !== "lin_api_...") {
+  const hasLinear = config.linear.apiKey && config.linear.apiKey.startsWith("lin_api_") && config.linear.apiKey.length > 20;
+  if (hasLinear) {
     try {
       const linear = new LinearProvider();
       await linear.init();
@@ -61,12 +62,24 @@ async function main() {
     console.log("[boot] GitHub skipped (no GITHUB_TOKEN/GITHUB_REPO)");
   }
 
-  // Slack bot
-  registerMentionHandler();
-  registerIngestCommand();
-  registerPostProcessHook(slackPostProcessHook);
-  await startSlackApp();
-  console.log("[boot] Slack bot ready");
+  // Slack bot — only start if tokens are configured
+  const hasSlack = config.slack.botToken && config.slack.appToken
+    && config.slack.botToken.startsWith("xoxb-") && config.slack.botToken.length > 20
+    && config.slack.appToken.startsWith("xapp-") && config.slack.appToken.length > 20;
+  if (hasSlack) {
+    try {
+      initSlackApp();
+      registerMentionHandler();
+      registerIngestCommand();
+      registerPostProcessHook(slackPostProcessHook);
+      await startSlackApp();
+      console.log("[boot] Slack bot ready");
+    } catch (err) {
+      console.warn("[boot] Slack bot failed:", err);
+    }
+  } else {
+    console.log("[boot] Slack skipped (no SLACK_BOT_TOKEN/SLACK_APP_TOKEN)");
+  }
 
   console.log(`\n[boot] System ready on port ${config.port}`);
 }
